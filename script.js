@@ -19,14 +19,22 @@ const mouse = {
   click: false,
 };
 
+const updateMousePosition = (X, Y) => {
+  mouse.x = X - canvasPosition.left;
+  mouse.y = Y - canvasPosition.top;
+};
+
 canvas.addEventListener("mousedown", (ev) => {
   mouse.click = true;
-  mouse.x = ev.x - canvasPosition.left;
-  mouse.y = ev.y - canvasPosition.top;
+  updateMousePosition(ev.x, ev.y);
 });
 
 canvas.addEventListener("mouseup", () => {
   mouse.click = false;
+});
+
+canvas.addEventListener("mousemove", (ev) => {
+  mouse.click && updateMousePosition(ev.x, ev.y);
 });
 
 window.addEventListener(
