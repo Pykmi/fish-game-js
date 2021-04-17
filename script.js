@@ -29,6 +29,17 @@ canvas.addEventListener("mouseup", () => {
   mouse.click = false;
 });
 
+window.addEventListener(
+  "resize",
+  () => (canvasPosition = canvas.getBoundingClientRect())
+);
+
+const playerLeft = new Image();
+playerLeft.src = "assets/red_fish_swim_left.png";
+
+const playerRight = new Image();
+playerRight.src = "assets/red_fish_swim_right.png";
+
 // Player
 class Player {
   constructor() {
@@ -50,12 +61,14 @@ class Player {
     const distanceX = this.x - mouse.x;
     const distanceY = this.y - mouse.y;
 
+    this.angle = Math.atan2(distanceY, distanceX);
+
     if (mouse.x !== this.x) {
-      this.x -= distanceX / 30;
+      this.x -= distanceX / 15;
     }
 
     if (mouse.y !== this.y) {
-      this.y -= distanceY / 30;
+      this.y -= distanceY / 15;
     }
   }
 
@@ -68,11 +81,34 @@ class Player {
       ctx.stroke();
     }
 
-    ctx.fillStyle = "red";
+    ctx.fillStyle = "rgba(255, 255, 255, 0.5)";
     ctx.beginPath();
     ctx.arc(this.x, this.y, this.radius, 0, Math.PI * 2);
     ctx.fill();
+    ctx.fillStyle;
     ctx.closePath();
+
+    ctx.save();
+    ctx.translate(this.x, this.y);
+    ctx.rotate(this.angle);
+
+    this.x >= mouse.x ? this.drawFish(playerLeft) : this.drawFish(playerRight);
+
+    ctx.restore();
+  }
+
+  drawFish(playerImage) {
+    ctx.drawImage(
+      playerImage,
+      this.frameX * this.spriteWidth,
+      this.frameY * this.spriteHeight,
+      this.spriteWidth,
+      this.spriteHeight,
+      0 - 63,
+      0 - 41,
+      this.spriteWidth / 4,
+      this.spriteHeight / 4
+    );
   }
 }
 
@@ -134,7 +170,7 @@ const handleBubbles = () => {
     B.y < 0 - this.radius * 2 && bubbles.splice(i, 1);
 
     // collision detection
-    if (B.distance < B.radius + player.radius) {
+    if (B.distance < B.radius + player.radius && bubbles[i]) {
       !B.touched && B.sound && bubblePop1.play();
       !B.touched && !B.sound && bubblePop2.play();
 
